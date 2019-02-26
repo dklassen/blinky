@@ -1,0 +1,5 @@
+package: github.com/dklassen/blinky
+import:
+- package: github.com/spf13/cobra
+  version: ^0.0.3
+- package: github.com/vitaminwater/cgo.wchar

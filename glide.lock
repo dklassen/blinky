@@ -1,0 +1,12 @@
+hash: 20ebbca5e9e696394b23f65ad105f7d3006024efa1ef286e2f97533e44b4d00b
+updated: 2019-02-28T20:58:19.113937-05:00
+imports:
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/spf13/cobra
+  version: ef82de70bb3f60c65fb8eebacbb2d122ef517385
+- name: github.com/spf13/pflag
+  version: 24fa6976df40757dce6aea913e7b81ade90530e1
+- name: github.com/vitaminwater/cgo.wchar
+  version: 5dd6f4be3f2a8c064325fe63439975cf37a8aa1d
+testImports: []
