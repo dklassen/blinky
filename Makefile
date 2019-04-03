@@ -4,5 +4,8 @@ clean:
 build: clean
 	go build
 
+install: 
+	go install
+
 run:
 	./blinky
