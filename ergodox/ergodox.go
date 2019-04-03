@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"time"
 
 	hid "github.com/dklassen/blinky/hidapi"
 )
@@ -68,10 +67,6 @@ var RGBLIGHT_MODE = map[string]byte{
 	"gradient":      25,
 }
 
-type stop struct {
-	error
-}
-
 type ErgodoxEZ struct {
 	device  *hid.Device
 	version int
@@ -111,7 +106,7 @@ func (keyboard *ErgodoxEZ) SetMode(mode string) ([]byte, error) {
 
 func (keyboard *ErgodoxEZ) Write(data []byte) (int, error) {
 	data = append([]byte{0}, data...)
-	val, err := keyboard.device.Write(data)
+	val, err := keyboard.device.WriteRetry(data, 10, 100)
 	return val, err
 }
 
@@ -143,28 +138,13 @@ func Find(vendorID uint16, productID uint16) (dev *hid.DeviceInfo, err error) {
 	return dev, nil
 }
 
-func Open(dev *hid.DeviceInfo, attempts int, sleep time.Duration) (keyboard *hid.Device, err error) {
-	if keyboard, err = dev.Open(); err != nil {
-		if s, ok := err.(stop); ok {
-			return keyboard, s.error
-		}
-
-		if attempts--; attempts > 0 {
-			time.Sleep(sleep)
-			return Open(dev, attempts, 2*sleep)
-		}
-		return keyboard, err
-	}
-	return keyboard, nil
-}
-
 func SetupErgodoxEZ() (*ErgodoxEZ, error) {
 	dev, err := Find(VendorID, ProductID)
 	if err != nil {
 		return nil, err
 	}
 
-	keyboard, err := Open(dev, 10, 0)
+	keyboard, err := hid.Open(dev, 10, 10)
 	if err != nil {
 		return nil, err
 	}

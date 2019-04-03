@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 	"unsafe"
 
 	wchar "github.com/vitaminwater/cgo.wchar"
@@ -76,6 +77,17 @@ func Enumerate(vendorID uint16, productID uint16) ([]DeviceInfo, error) {
 	return infos, err
 }
 
+func Open(deviceInfo *DeviceInfo, attempts int, sleep time.Duration) (device *Device, err error) {
+	if device, err = deviceInfo.Open(); err != nil {
+		if attempts--; attempts > 0 {
+			time.Sleep(sleep)
+			return Open(deviceInfo, attempts, 2*sleep)
+		}
+		return device, err
+	}
+	return device, nil
+}
+
 func (info DeviceInfo) Open() (*Device, error) {
 	enumerateLock.Lock()
 	defer enumerateLock.Unlock()
@@ -91,6 +103,22 @@ func (info DeviceInfo) Open() (*Device, error) {
 		DeviceInfo: info,
 		hid_device: device,
 	}, nil
+}
+
+func (dev *Device) WriteRetry(data []byte, attempts int, sleep time.Duration) (written int, err error) {
+	if written, err = dev.Write(data); err != nil {
+		fmt.Println("attempts: %d , written: %s error: %s", attempts, written, err)
+		if attempts--; attempts > 0 {
+			time.Sleep(sleep)
+			return dev.WriteRetry(data, attempts, 2*sleep)
+		}
+
+		fmt.Println("attempts: %d , written: %s error: %s", attempts, written, err)
+		return written, err
+	}
+
+	fmt.Println("attempts: %d , written: %s error: %s", attempts, written, err)
+	return written, err
 }
 
 func (dev *Device) Write(b []byte) (int, error) {
