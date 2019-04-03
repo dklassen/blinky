@@ -107,17 +107,13 @@ func (info DeviceInfo) Open() (*Device, error) {
 
 func (dev *Device) WriteRetry(data []byte, attempts int, sleep time.Duration) (written int, err error) {
 	if written, err = dev.Write(data); err != nil {
-		fmt.Println("attempts: %d , written: %s error: %s", attempts, written, err)
 		if attempts--; attempts > 0 {
 			time.Sleep(sleep)
 			return dev.WriteRetry(data, attempts, 2*sleep)
 		}
-
-		fmt.Println("attempts: %d , written: %s error: %s", attempts, written, err)
 		return written, err
 	}
 
-	fmt.Println("attempts: %d , written: %s error: %s", attempts, written, err)
 	return written, err
 }
 
