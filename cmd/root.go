@@ -8,7 +8,7 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "version",
+	Use:   "blinky",
 	Short: "Blinky allows sending HID LED commands to your ErgoDox EZ",
 }
 
